@@ -84,7 +84,7 @@ namespace SwagLabsTests
 			loginPage.WhenEnteredPasswordIs(givenPassword);
 			loginPage.WhenLoginButtonPressed();
 
-			loginPage.Validator.ThenLoginSuccessful().Should().BeTrue(because: "Login should be successful with valid credentials");
+			loginPage.Validator.ThenLoginSuccessful().Should().BeTrue( because: "Login should be successful with valid credentials");
 		}
 
 		[TestCleanup]

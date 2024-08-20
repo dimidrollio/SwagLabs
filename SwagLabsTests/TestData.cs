@@ -1,13 +1,10 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
+﻿using OpenQA.Selenium.Chrome;
 using SwagLabs;
 namespace SwagLabsTests
 {
 	// Data for tests execution
 	public static class TestData
 	{
-		private static IWebDriver driver = new ChromeDriver();
-		private static SwagLabsLoginPage loginPage = new(driver);
 		private static IEnumerable<string> SupportedBrowsers => ["chrome", "edge"];
 
 		public static IEnumerable<object[]> GetSupportedBrowsers()
@@ -18,26 +15,31 @@ namespace SwagLabsTests
 			{
 				data.Add([browser]);
 			}
-			driver.Quit();
+
 			return data;
 		}
 
 		public static IEnumerable<object[]> GetLoginWithValidCredentials()
 		{
-			loginPage.Navigate();
-
-			List<object[]> data = [];
-			IEnumerable<string> availableUsernames = loginPage.GetAvailableUsernames();
-
-			foreach (string browser in SupportedBrowsers)
+			using (var driver = new ChromeDriver())
 			{
-				foreach (string username in availableUsernames)
+				List<object[]> data = [];
+
+				var loginPage = new SwagLabsLoginPage(driver);
+				loginPage.Navigate();
+
+				IEnumerable<string> availableUsernames = loginPage.GetAvailableUsernames();
+
+				foreach (string browser in SupportedBrowsers)
 				{
-					data.Add([browser, username]);
+					foreach (string username in availableUsernames)
+					{
+						data.Add([browser, username]);
+					}
 				}
+
+				return data;
 			}
-			driver.Quit();
-			return data;
 		}
 	}
 }

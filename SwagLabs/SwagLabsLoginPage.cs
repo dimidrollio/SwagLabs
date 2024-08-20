@@ -10,12 +10,12 @@ namespace SwagLabs
 		private const string _url = "https://www.saucedemo.com/";
 
 		private readonly WebDriverWait _waiter;
-		public SwagLabsLoginPageMap Map;
-		public SwagLabsLoginPageValidator Validator;
+		public SwagLabsLoginPageMap Map { get; }
+		public SwagLabsLoginPageValidator Validator { get; }
 
 		public SwagLabsLoginPage(IWebDriver driver)
 		{
-			_driver = driver;
+			_driver = driver ?? throw new ArgumentNullException(nameof(driver));
 			_waiter = new(_driver, TimeSpan.FromSeconds(5));
 			Map = new(_driver);
 			Validator = new(_driver);
@@ -42,6 +42,8 @@ namespace SwagLabs
 		}
 		public void WhenElementCleared(IWebElement element)
 		{
+			if (element == null) throw new ArgumentNullException(nameof(element));
+
 			if (_waiter.Until(c => element.Enabled))
 			{
 				element.Click();

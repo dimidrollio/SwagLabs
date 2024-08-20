@@ -12,7 +12,7 @@ namespace SwagLabs
 		protected SwagLabsLoginPageMap _map;
         public SwagLabsLoginPageValidator(IWebDriver driver)
         {
-            _driver = driver;
+            _driver = driver ?? throw new ArgumentNullException(nameof(driver));
 			_waiter = new(_driver, TimeSpan.FromSeconds(5));
 			_map = new(_driver);
 		}
