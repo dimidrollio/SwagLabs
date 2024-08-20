@@ -3,6 +3,7 @@ using OpenQA.Selenium.Chrome;
 using SwagLabs;
 using FluentAssertions;
 using OpenQA.Selenium.Edge;
+using System.Collections.Specialized;
 
 [assembly: Parallelize(Scope = ExecutionScope.MethodLevel)]
 namespace SwagLabsTests
@@ -32,6 +33,8 @@ namespace SwagLabsTests
 		[DynamicData(nameof(TestData.GetSupportedBrowsers), typeof(TestData), DynamicDataSourceType.Method)]
 		public void Login_WhenUsernameAndPasswordEmpty_ThenErrorMessageShown(string browserName)
 		{
+			if (_driver is null) throw new Exception("Driver not set");
+
 			var givenUsername = "random username";
 			var givenPassword = "random password";
 
@@ -54,6 +57,8 @@ namespace SwagLabsTests
 		[DynamicData(nameof(TestData.GetSupportedBrowsers), typeof(TestData), DynamicDataSourceType.Method)]
 		public void Login_WhenPasswordEmpty_ThenErrorMessageShown(string browserName)
 		{
+			if (_driver is null) throw new Exception("Driver not set");
+
 			var givenUsername = "random username";
 			var givenPassword = "random password";
 
@@ -75,6 +80,8 @@ namespace SwagLabsTests
 		[DynamicData(nameof(TestData.GetLoginWithValidCredentials), typeof(TestData), DynamicDataSourceType.Method)]
 		public void Login_WhenValidCredentialsEntered_ThenLoginSuccessful(string browserName, string givenUsername)
 		{
+			if (_driver is null) throw new Exception("Driver not set");
+
 			string givenPassword = "secret_sauce";
 
 			SetBrowser(browserName);
