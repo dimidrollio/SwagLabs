@@ -33,12 +33,12 @@ namespace SwagLabsTests
 		[DynamicData(nameof(TestData.GetSupportedBrowsers), typeof(TestData), DynamicDataSourceType.Method)]
 		public void Login_WhenUsernameAndPasswordEmpty_ThenErrorMessageShown(string browserName)
 		{
+			SetBrowser(browserName);
 			if (_driver is null) throw new Exception("Driver not set");
 
 			var givenUsername = "random username";
 			var givenPassword = "random password";
 
-			SetBrowser(browserName);
 			var loginPage = new SwagLabsLoginPage(_driver);
 			loginPage.Navigate();
 
@@ -57,12 +57,12 @@ namespace SwagLabsTests
 		[DynamicData(nameof(TestData.GetSupportedBrowsers), typeof(TestData), DynamicDataSourceType.Method)]
 		public void Login_WhenPasswordEmpty_ThenErrorMessageShown(string browserName)
 		{
+			SetBrowser(browserName);
 			if (_driver is null) throw new Exception("Driver not set");
 
 			var givenUsername = "random username";
 			var givenPassword = "random password";
 
-			SetBrowser(browserName);
 			var loginPage = new SwagLabsLoginPage(_driver);
 			loginPage.Navigate();
 
@@ -80,11 +80,11 @@ namespace SwagLabsTests
 		[DynamicData(nameof(TestData.GetLoginWithValidCredentials), typeof(TestData), DynamicDataSourceType.Method)]
 		public void Login_WhenValidCredentialsEntered_ThenLoginSuccessful(string browserName, string givenUsername)
 		{
+			SetBrowser(browserName);
 			if (_driver is null) throw new Exception("Driver not set");
 
 			string givenPassword = "secret_sauce";
 
-			SetBrowser(browserName);
 			SwagLabsLoginPage loginPage = new SwagLabsLoginPage(_driver);
 			loginPage.Navigate();
 			loginPage.WhenEnteredUsernameIs(givenUsername);
