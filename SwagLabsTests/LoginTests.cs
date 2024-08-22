@@ -1,45 +1,46 @@
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using SwagLabs;
 using FluentAssertions;
-using OpenQA.Selenium.Edge;
-using System.Collections.Specialized;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SwagLabs.Driver.Chrome;
+using SwagLabs.Driver;
+using SwagLabs.PageObjects.LoginPageObject;
+using SwagLabs;
 
 [assembly: Parallelize(Scope = ExecutionScope.MethodLevel)]
 namespace SwagLabsTests
 {
 
 	[TestClass]
-	public class SwagLabsLoginTests
+	public class LoginTests
 	{
-		private IWebDriver _driver;
-
-		public void SetBrowser(string browserName)
-		{
-			switch (browserName.ToLower())
+		private IDriverManager driverManager;
+		private static IEnumerable<object[]> CredentialsTestData {
+			get
 			{
-				case "chrome":
-					_driver = new ChromeDriver();
-					break;
-				case "edge":
-					_driver = new EdgeDriver();
-					break;
+				var driver = new ChromeDriverManager();
+				var lPage = new LoginPage(driver.GetDriver());
+				lPage.Navigate();
 
-				default: throw new ArgumentException("Unknown browser");
+				var res = LoginTestData.GetLoginWithValidCredentials(lPage.GetAvailableUsernames());
+				
+				driver.QuitDriver();
+				return res;
 			}
 		}
 
 		[DataTestMethod]
-		[DynamicData(nameof(TestData.GetSupportedBrowsers), typeof(TestData), DynamicDataSourceType.Method)]
+		[DynamicData(nameof(LoginTestData.GetSupportedBrowsers), typeof(LoginTestData), DynamicDataSourceType.Property)]
 		public void Login_WhenUsernameAndPasswordEmpty_ThenErrorMessageShown(string browserName)
 		{
-			SetBrowser(browserName);
-			if (_driver is null) throw new Exception("Driver not set");
+			driverManager = new DriverFactory().CreateDriverManager(browserName);
+			var driver = driverManager.CreateDriver();
+			
+			if (driver is null) throw new Exception("Driver not set");
 
 			var givenUsername = "random username";
 			var givenPassword = "random password";
 
-			var loginPage = new SwagLabsLoginPage(_driver);
+			var loginPage = new LoginPage(driver);
 			loginPage.Navigate();
 
 			loginPage.WhenEnteredUsernameIs(givenUsername);
@@ -54,16 +55,18 @@ namespace SwagLabsTests
 		}
 
 		[DataTestMethod]
-		[DynamicData(nameof(TestData.GetSupportedBrowsers), typeof(TestData), DynamicDataSourceType.Method)]
+		[DynamicData(nameof(LoginTestData.GetSupportedBrowsers), typeof(LoginTestData), DynamicDataSourceType.Property)]
 		public void Login_WhenPasswordEmpty_ThenErrorMessageShown(string browserName)
 		{
-			SetBrowser(browserName);
-			if (_driver is null) throw new Exception("Driver not set");
+			driverManager = new DriverFactory().CreateDriverManager(browserName);
+			var driver = driverManager.CreateDriver();
+
+			if (driver is null) throw new Exception("Driver not set");
 
 			var givenUsername = "random username";
 			var givenPassword = "random password";
 
-			var loginPage = new SwagLabsLoginPage(_driver);
+			var loginPage = new LoginPage(driver);
 			loginPage.Navigate();
 
 			loginPage.WhenEnteredUsernameIs(givenUsername);
@@ -77,15 +80,17 @@ namespace SwagLabsTests
 		}
 
 		[DataTestMethod]
-		[DynamicData(nameof(TestData.GetLoginWithValidCredentials), typeof(TestData), DynamicDataSourceType.Method)]
+		[DynamicData(nameof(CredentialsTestData), DynamicDataSourceType.Property)]
 		public void Login_WhenValidCredentialsEntered_ThenLoginSuccessful(string browserName, string givenUsername)
 		{
-			SetBrowser(browserName);
-			if (_driver is null) throw new Exception("Driver not set");
+			driverManager = new DriverFactory().CreateDriverManager(browserName);
+			var driver = driverManager.CreateDriver();
+
+			if (driver is null) throw new Exception("Driver not set");
 
 			string givenPassword = "secret_sauce";
-
-			SwagLabsLoginPage loginPage = new SwagLabsLoginPage(_driver);
+			
+			var loginPage = new LoginPage(driver);
 			loginPage.Navigate();
 			loginPage.WhenEnteredUsernameIs(givenUsername);
 			loginPage.WhenEnteredPasswordIs(givenPassword);
@@ -97,7 +102,7 @@ namespace SwagLabsTests
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			_driver.Quit();
+			driverManager.QuitDriver();
 		}
 	}
 }
