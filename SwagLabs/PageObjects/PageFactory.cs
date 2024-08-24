@@ -3,7 +3,7 @@ using SwagLabs.PageObjects.LoginPageObject;
 
 namespace SwagLabs.PageObjects
 {
-	public class PageFactory : IPageFactory
+    public class PageFactory : IPageFactory
 	{
 		public ILoginPage CreateLoginPage(IWebDriver driver)
 		{

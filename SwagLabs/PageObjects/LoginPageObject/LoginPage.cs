@@ -1,10 +1,9 @@
 ﻿using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
-using TechTalk.SpecFlow;
+using NLog;
 
 namespace SwagLabs.PageObjects.LoginPageObject
 {
-	[Binding]
     public class LoginPage : ILoginPage
     {
         private readonly IWebDriver _driver;

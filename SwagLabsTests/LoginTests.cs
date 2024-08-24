@@ -30,73 +30,59 @@ namespace SwagLabsTests
 
 		[DataTestMethod]
 		[DynamicData(nameof(LoginTestData.GetSupportedBrowsers), typeof(LoginTestData), DynamicDataSourceType.Property)]
-		public void Login_WhenUsernameAndPasswordEmpty_ThenErrorMessageShown(string browserName)
+		public void GivenAnyCredentials_WhenCredentialsEntered_AndCredentialsCleared_AndLoginButtonClicked_ThenErrorMessageShouldBe(string browserName)
 		{
 			driverManager = new DriverFactory().CreateDriverManager(browserName);
 			var driver = driverManager.CreateDriver();
-			
 			if (driver is null) throw new Exception("Driver not set");
 
-			var givenUsername = "random username";
-			var givenPassword = "random password";
-
-			var loginPage = new LoginPage(driver);
-			loginPage.Navigate();
-
-			loginPage.WhenEnteredUsernameIs(givenUsername);
-			loginPage.WhenEnteredPasswordIs(givenPassword);
+			var steps = new LoginTestSteps(new LoginPage(driver));
 			
-			loginPage.WhenElementCleared(loginPage.Map.UsernameField);
-			loginPage.WhenElementCleared(loginPage.Map.PasswordField);
-			
-			loginPage.WhenLoginButtonPressed();
+			steps.GivenAnyCredentials();
 
-			loginPage.Validator.ThenErrorMessageShouldBe("Username is required").Should().BeTrue(because: "Should show a valid error logging with empty credentials");
+			steps.WhenEnteredAnyCredentials();
+			steps.AndClearedAllCredentials();
+			steps.AndLoginButtonPressed();
+
+			steps.ThenErrorMessageShouldBe("Username is required").Should().BeTrue(because: "Username should be entered");
 		}
 
 		[DataTestMethod]
 		[DynamicData(nameof(LoginTestData.GetSupportedBrowsers), typeof(LoginTestData), DynamicDataSourceType.Property)]
-		public void Login_WhenPasswordEmpty_ThenErrorMessageShown(string browserName)
+		public void GivenAnyCredentials_WhenCredentialsEntered_AndPasswordCleared_AndLoginButtonClicked_ThenErrorMessageShouldBe(string browserName)
 		{
 			driverManager = new DriverFactory().CreateDriverManager(browserName);
 			var driver = driverManager.CreateDriver();
-
 			if (driver is null) throw new Exception("Driver not set");
 
-			var givenUsername = "random username";
-			var givenPassword = "random password";
+			var steps = new LoginTestSteps(new LoginPage(driver));
 
-			var loginPage = new LoginPage(driver);
-			loginPage.Navigate();
+			steps.GivenAnyCredentials();
 
-			loginPage.WhenEnteredUsernameIs(givenUsername);
-			loginPage.WhenEnteredPasswordIs(givenPassword);
+			steps.WhenEnteredAnyCredentials();
+			steps.AndClearedPassword();
+			steps.AndLoginButtonPressed();
 
-			loginPage.WhenElementCleared(loginPage.Map.PasswordField);
-
-			loginPage.WhenLoginButtonPressed();
-
-			loginPage.Validator.ThenErrorMessageShouldBe("Password is required").Should().BeTrue(because: "Should show a valid error logging with empty credentials");
+			steps.ThenErrorMessageShouldBe("Password is required").Should().BeTrue(because: "Username should be entered");
 		}
 
 		[DataTestMethod]
 		[DynamicData(nameof(CredentialsTestData), DynamicDataSourceType.Property)]
-		public void Login_WhenValidCredentialsEntered_ThenLoginSuccessful(string browserName, string givenUsername)
+		public void GivenValidCredentials_WhenCredentialsEntered_AndLoginButtonClicked_ThenLoginSuccessful(string browserName, string givenUsername)
 		{
+			string validPassword = "secret_sauce";
 			driverManager = new DriverFactory().CreateDriverManager(browserName);
 			var driver = driverManager.CreateDriver();
-
 			if (driver is null) throw new Exception("Driver not set");
 
-			string givenPassword = "secret_sauce";
-			
-			var loginPage = new LoginPage(driver);
-			loginPage.Navigate();
-			loginPage.WhenEnteredUsernameIs(givenUsername);
-			loginPage.WhenEnteredPasswordIs(givenPassword);
-			loginPage.WhenLoginButtonPressed();
+			var steps = new LoginTestSteps(new LoginPage(driver));
 
-			loginPage.Validator.ThenLoginSuccessful().Should().BeTrue( because: "Login should be successful with valid credentials");
+			steps.GivenValidCredentials(givenUsername, validPassword);
+
+			steps.WhenEnteredValidCredentials();
+			steps.AndLoginButtonPressed();
+
+			steps.ThenLoginShouldBeSuccessful().Should().BeTrue( because: "Login should be successful with valid credentials");
 		}
 
 		[TestCleanup]
